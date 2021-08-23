@@ -409,7 +409,8 @@ def delete_items():
 def delete_bulk(doctype, items):
 	for i, d in enumerate(items):
 		try:
-			frappe.delete_doc(doctype, d)
+			doc = frappe.get_cached_doc(doctype,d)
+			doc.delete()
 			if len(items) >= 5:
 				frappe.publish_realtime("progress",
 					dict(progress=[i+1, len(items)], title=_('Deleting {0}').format(doctype), description=d),
