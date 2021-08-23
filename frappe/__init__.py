@@ -457,7 +457,7 @@ def set_user(username):
 	local.cache = {}
 	local.form_dict = _dict()
 	local.jenv = None
-	local.session.data = _dict()
+	local.session.data = _dict(user=username)
 	local.role_permissions = {}
 	local.new_doc_templates = {}
 	local.user_perms = None
