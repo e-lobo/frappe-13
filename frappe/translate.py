@@ -60,7 +60,7 @@ def get_language(lang_list: List = None) -> str:
 
 	# use language set in User or System Settings if user is logged in
 	if is_logged_in:
-		return get_user_lang(frappe.session.user)
+		return frappe.local.lang
 
 	lang_set = set(lang_list or get_all_languages() or [])
 

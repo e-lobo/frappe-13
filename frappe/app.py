@@ -4,7 +4,6 @@
 from __future__ import unicode_literals
 
 import os
-from frappe.translate import get_language
 from six import iteritems
 import logging
 
@@ -59,7 +58,6 @@ def application(request):
 		frappe.rate_limiter.apply()
 		frappe.api.validate_auth()
 
-		frappe.local.lang = get_language()
 
 		if request.method == "OPTIONS":
 			response = Response()
