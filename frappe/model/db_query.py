@@ -789,8 +789,9 @@ class DatabaseQuery(object):
 def check_parent_permission(parent, child_doctype):
 	if parent:
 		# User may pass fake parent and get the information from the child table
-		if child_doctype and not frappe.db.exists('DocField',
-			{'parent': parent, 'options': child_doctype}):
+		# lets check meta as the child_doctype may be a custom field which won't exist in Docfield
+		table_fields = frappe.get_meta(parent).get_table_fields()
+		if child_doctype and not len(list(filter(lambda table_field: table_field.parent == parent and table_field.options == child_doctype, table_fields))):
 			raise frappe.PermissionError
 
 		if frappe.permissions.has_permission(parent):
