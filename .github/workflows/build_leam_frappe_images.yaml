@@ -15,8 +15,8 @@ jobs:
     - name: Checkout frappe_docker repo
       uses: actions/checkout@v2
       with:
-        repository: yaacine/frappe_docker  #TODO: change yaacine to leam-tech
-        ref: sync-leam-fork
+        repository: leam-tech/frappe_docker
+        ref: leam-fork
         token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
 
@@ -89,7 +89,7 @@ jobs:
     - name: Checkout frappe_docker repo
       uses: actions/checkout@v2
       with:
-        repository: yaacine/frappe_docker #TODO: change yaacine to leam-tech
+        repository: leam-tech/frappe_docker #TODO: change yaacine to leam-tech
         ref: leam-fork
         token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
