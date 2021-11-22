@@ -29,9 +29,9 @@ jobs:
           registry.romman.io/leam-frappe-nginx
         # generate Docker tags based on the following events/attributes
         tags: |
-          type=semver,pattern={{version}}
-          type=schedule,pattern={{date 'YYYYMMDD'}}
           type=semver,pattern={{major}}.{{minor}}
+          type=schedule,pattern={{date 'YYYYMMDD'}}
+          
         labels: |
           org.opencontainers.image.title=leam-frappe-nginx
           org.opencontainers.image.description=nginx image for leam frappe 
@@ -104,9 +104,8 @@ jobs:
           registry.romman.io/leam-frappe-worker
         # generate Docker tags based on the following events/attributes
         tags: |
-          type=semver,pattern={{version}}
-          type=schedule,pattern={{date 'YYYYMMDD'}}
           type=semver,pattern={{major}}.{{minor}}
+          type=schedule,pattern={{date 'YYYYMMDD'}}
         
         labels: |
           org.opencontainers.image.title=leam-frappe-worker
