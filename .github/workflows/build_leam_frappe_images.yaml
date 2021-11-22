@@ -38,7 +38,7 @@ jobs:
           org.opencontainers.image.vendor=leam-tech
         
         flavor: |
-          latest=true
+          latest=false
 
   
     - name: Image Tag output 
@@ -113,7 +113,7 @@ jobs:
           org.opencontainers.image.vendor=romman.io
         
         flavor: |
-          latest=true
+          latest=false
 
           
     
