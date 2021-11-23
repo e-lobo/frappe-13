@@ -14,6 +14,7 @@ import cProfile, pstats
 from six import StringIO
 from six.moves import reload_module
 from frappe.model.naming import revert_series_if_last
+from frappe.utils import cint
 
 unittest_runner = unittest.TextTestRunner
 SLOW_TEST_THRESHOLD = 2
@@ -73,7 +74,9 @@ def main(app=None, module=None, doctype=None, verbose=False, tests=(),
 		else:
 			ret = run_all_tests(app, verbose, profile, ui_tests, failfast=failfast, junit_xml_output=junit_xml_output)
 
-		frappe.utils.scheduler.enable_scheduler()
+		if cint(frappe.db.get_value("System Settings", fieldname="enable_scheduler")):
+			frappe.utils.scheduler.disable_scheduler()
+			if frappe.db: frappe.db.commit()
 		if frappe.db: frappe.db.commit()
 
 		# workaround! since there is no separate test db
