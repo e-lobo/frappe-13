@@ -160,7 +160,7 @@ def get_role_permissions(doctype_meta, user=None, is_owner=None):
 
 	if not user: user = frappe.session.user
 
-	cache_key = (doctype_meta.name, user)
+	cache_key = (doctype_meta.name, user, cint(is_owner))
 
 	if user == 'Administrator':
 		return allow_everything()
