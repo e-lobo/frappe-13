@@ -429,7 +429,10 @@ def validate_link(doctype: str, docname: str, fields=None):
 		return values
 
 	try:
-		values.update(get_value(doctype, fields, docname))
+		parenttype=None
+		if frappe.is_table(doctype) and docname:
+			parenttype = frappe.get_cached_value(doctype, docname, "parenttype")
+		values.update(get_value(doctype, fields, docname, parent=parenttype))
 	except frappe.PermissionError:
 		frappe.clear_last_message()
 		frappe.msgprint(
