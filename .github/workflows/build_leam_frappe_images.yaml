@@ -28,8 +28,9 @@ jobs:
         images: |
           registry.romman.io/leam-frappe-nginx
         # generate Docker tags based on the following events/attributes
+        # TODO: make sure the patch number here is always at 0
         tags: |
-          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}.{{minor}}.{{patch}}
           type=schedule,pattern={{date 'YYYYMMDD'}}
           
         labels: |
@@ -89,7 +90,7 @@ jobs:
     - name: Checkout frappe_docker repo
       uses: actions/checkout@v2
       with:
-        repository: leam-tech/frappe_docker #TODO: change yaacine to leam-tech
+        repository: leam-tech/frappe_docker 
         ref: leam-fork
         token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
@@ -103,8 +104,9 @@ jobs:
           
           registry.romman.io/leam-frappe-worker
         # generate Docker tags based on the following events/attributes
+        # TODO: make sure the patch number here is always at 0
         tags: |
-          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}.{{minor}}.{{patch}}
           type=schedule,pattern={{date 'YYYYMMDD'}}
         
         labels: |
