@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: leam-tech/frappe_docker
-        ref: leam-fork
+        ref: sync-leam-fork
         token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
 
@@ -91,7 +91,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: leam-tech/frappe_docker 
-        ref: leam-fork
+        ref: sync-leam-fork
         token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
 
