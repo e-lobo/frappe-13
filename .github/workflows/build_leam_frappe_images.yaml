@@ -17,7 +17,7 @@ jobs:
       with:
         repository: leam-tech/frappe_docker
         ref: sync-leam-fork
-        token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
+        # token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
 
     - name: Docker meta
@@ -69,8 +69,8 @@ jobs:
         push: true #${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        secrets: |
-          GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
+        # secrets: |
+        #   GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
 
     - name: Image digest
       run: |
@@ -92,7 +92,7 @@ jobs:
       with:
         repository: leam-tech/frappe_docker 
         ref: sync-leam-fork
-        token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
+        # token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
         
 
     - name: Docker meta
@@ -147,8 +147,8 @@ jobs:
         push: true #${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        secrets: |
-          GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
+        # secrets: |
+        #   GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
     
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
