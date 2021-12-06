@@ -1,0 +1,158 @@
+name: Docker Image CI For Leam Frappe (version-13-fixes)
+
+on:
+  push:
+    # branches: [ frappe-fork-cicd ]
+
+    tags:
+        - 'v*'
+jobs:
+  build-leam-frappe-nginx:
+    runs-on: ubuntu-20.04
+    steps:
+
+    # checkout the frappe docker repo in order to use it to build the images
+    - name: Checkout frappe_docker repo
+      uses: actions/checkout@v2
+      with:
+        repository: leam-tech/frappe_docker
+        ref: sync-leam-fork
+        # token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
+        
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        # list of Docker images to use as base name for tags
+        images: |
+          registry.romman.io/leam-frappe-nginx
+        # generate Docker tags based on the following events/attributes
+        # TODO: make sure the patch number here is always at 0
+        tags: |
+          type=semver,pattern={{major}}.{{minor}}.{{patch}}
+          type=schedule,pattern={{date 'YYYYMMDD'}}
+          
+        labels: |
+          org.opencontainers.image.title=leam-frappe-nginx
+          org.opencontainers.image.description=nginx image for leam frappe 
+          org.opencontainers.image.vendor=leam-tech
+        
+        flavor: |
+          latest=false
+
+  
+    - name: Image Tag output 
+      run: |
+        echo ${{ steps.meta.outputs.tags }}
+
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to self-hosted registry
+      uses: docker/login-action@v1 
+      with:
+        registry: registry.romman.io
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: build/frappe-nginx/Dockerfile
+        push: true #${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        # secrets: |
+        #   GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
+
+    - name: Image digest
+      run: |
+        echo ${{ steps.docker_build.outputs.digest }}
+   
+   
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+
+
+  build-leam-frappe-worker:
+    runs-on: ubuntu-20.04
+    steps:
+
+    # checkout the frappe docker repo in order to use it to build the images
+    - name: Checkout frappe_docker repo
+      uses: actions/checkout@v2
+      with:
+        repository: leam-tech/frappe_docker 
+        ref: sync-leam-fork
+        # token: ${{ secrets.MY_GIT_AUTH_TOKEN }} # `GH_PAT` is a secret that contains your PAT
+        
+
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        # list of Docker images to use as base name for tags
+        images: |
+          
+          registry.romman.io/leam-frappe-worker
+        # generate Docker tags based on the following events/attributes
+        # TODO: make sure the patch number here is always at 0
+        tags: |
+          type=semver,pattern={{major}}.{{minor}}.{{patch}}
+          type=schedule,pattern={{date 'YYYYMMDD'}}
+        
+        labels: |
+          org.opencontainers.image.title=leam-frappe-worker
+          org.opencontainers.image.description=worker image for leam frappe 
+          org.opencontainers.image.vendor=romman.io
+        
+        flavor: |
+          latest=false
+
+          
+    
+    - name: Image Tag output 
+      run: |
+        echo ${{ steps.meta.outputs.tags }}
+        echo ${{ steps.meta.outputs.version }}
+
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to self-hosted registry
+      uses: docker/login-action@v1 
+      with:
+        registry: registry.romman.io
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: build/frappe-worker/Dockerfile
+        push: true #${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        # secrets: |
+        #   GH_ACCESS_TOKEN=${{ secrets.MY_GIT_AUTH_TOKEN }}
+    
+    - name: Image digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
+   
+   
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
