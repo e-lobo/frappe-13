@@ -59,6 +59,7 @@ def main(app=None, module=None, doctype=None, verbose=False, tests=(),
 		# workaround! since there is no separate test db
 		frappe.clear_cache()
 		frappe.utils.scheduler.disable_scheduler()
+		if frappe.db: frappe.db.commit()
 		set_test_email_config()
 
 		if not frappe.flags.skip_before_tests:
@@ -74,9 +75,7 @@ def main(app=None, module=None, doctype=None, verbose=False, tests=(),
 		else:
 			ret = run_all_tests(app, verbose, profile, ui_tests, failfast=failfast, junit_xml_output=junit_xml_output)
 
-		if cint(frappe.db.get_value("System Settings", fieldname="enable_scheduler")):
-			frappe.utils.scheduler.disable_scheduler()
-			if frappe.db: frappe.db.commit()
+		frappe.utils.scheduler.enable_scheduler()
 		if frappe.db: frappe.db.commit()
 
 		# workaround! since there is no separate test db
