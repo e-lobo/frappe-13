@@ -119,11 +119,15 @@ def import_file_by_path(path: str,force: bool = False,data_import: bool = False,
 
 				# if hash exists and is equal no need to update
 				if stored_hash and stored_hash == calculated_hash:
-					return False
+					if len(docs) == 1:
+						return False
+					continue
 
 				# if hash doesn't exist, check if db timestamp is same as json timestamp, add hash if from doctype
 				if is_db_timestamp_latest and doc["doctype"] != "DocType":
-					return False
+					if len(docs) == 1:
+						return False
+					continue
 
 			import_doc(
 				docdict=doc,
