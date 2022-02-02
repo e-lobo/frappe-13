@@ -675,7 +675,7 @@ class BaseDocument(object):
 			if data_field_options == "URL":
 				if not data:
 					continue
-				
+
 				frappe.utils.validate_url(data, throw=True)
 
 	def _validate_constants(self):
@@ -1011,15 +1011,12 @@ def _filter(data, filters, limit=None):
 			_filters[f] = fval
 
 	for d in data:
-		add = True
-		for f, fval in iteritems(_filters):
+		for f, fval in _filters.items():
 			if not frappe.compare(getattr(d, f, None), fval[0], fval[1]):
-				add = False
 				break
-
-		if add:
+		else:
 			out.append(d)
-			if limit and (len(out)-1)==limit:
+			if limit and len(out) >= limit:
 				break
 
 	return out

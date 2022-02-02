@@ -5,17 +5,33 @@ from typing import Optional
 import frappe
 import operator
 import json
+import base64
 import re, datetime, math, time
 from six.moves.urllib.parse import quote, urljoin
 from six import iteritems, text_type, string_types, integer_types
 from code import compile_command
 from frappe.desk.utils import slug
 from click import secho
+from enum import Enum
 
 DATE_FORMAT = "%Y-%m-%d"
 TIME_FORMAT = "%H:%M:%S.%f"
 DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT
 
+class Weekday(Enum):
+	Sunday = 0
+	Monday = 1
+	Tuesday = 2
+	Wednesday = 3
+	Thursday = 4
+	Friday = 5
+	Saturday = 6
+
+def get_first_day_of_the_week():
+	return frappe.get_system_settings('first_day_of_the_week') or "Sunday"
+
+def get_start_of_week_index():
+	return Weekday[get_first_day_of_the_week()].value
 
 def is_invalid_date_string(date_string):
 	# dateutil parser does not agree with dates like "0001-01-01" or "0000-00-00"
@@ -246,8 +262,21 @@ def get_quarter_start(dt, as_str=False):
 
 def get_first_day_of_week(dt, as_str=False):
 	dt = getdate(dt)
-	date = dt - datetime.timedelta(days=dt.weekday())
+	date = dt - datetime.timedelta(days=get_week_start_offset_days(dt))
 	return date.strftime(DATE_FORMAT) if as_str else date
+
+def get_week_start_offset_days(dt):
+	current_day_index = get_normalized_weekday_index(dt)
+	start_of_week_index = get_start_of_week_index()
+
+	if current_day_index >= start_of_week_index:
+		return current_day_index - start_of_week_index
+	else:
+		return 7 - (start_of_week_index - current_day_index)
+
+def get_normalized_weekday_index(dt):
+	# starts Sunday with 0
+	return (dt.weekday() + 1) % 7
 
 def get_year_start(dt, as_str=False):
 	dt = getdate(dt)
@@ -507,10 +536,10 @@ def get_timespan_date_range(timespan):
 		"yesterday": lambda: (add_to_date(today, days=-1),) * 2,
 		"today": lambda: (today, today),
 		"tomorrow": lambda: (add_to_date(today, days=1),) * 2,
-		"this week": lambda: (get_first_day_of_week(today), today),
-		"this month": lambda: (get_first_day(today), today),
-		"this quarter": lambda: (get_quarter_start(today), today),
-		"this year": lambda: (get_year_start(today), today),
+		"this week": lambda: (get_first_day_of_week(today), get_last_day_of_week(today)),
+		"this month": lambda: (get_first_day(today), get_last_day(today)),
+		"this quarter": lambda: (get_quarter_start(today), get_quarter_ending(today)),
+		"this year": lambda: (get_year_start(today), get_year_ending(today)),
 		"next week": lambda: (get_first_day_of_week(add_to_date(today, days=7)), get_last_day_of_week(add_to_date(today, days=7))),
 		"next month": lambda: (get_first_day(add_to_date(today, months=1)), get_last_day(add_to_date(today, months=1))),
 		"next quarter": lambda: (get_quarter_start(add_to_date(today, months=3)), get_quarter_ending(add_to_date(today, months=3))),
@@ -1014,7 +1043,6 @@ def get_thumbnail_base64_for_image(src):
 	return cache().hget('thumbnail_base64', src, generator=_get_base64)
 
 def image_to_base64(image, extn):
-	import base64
 	from io import BytesIO
 
 	buffered = BytesIO()
@@ -1024,6 +1052,20 @@ def image_to_base64(image, extn):
 	img_str = base64.b64encode(buffered.getvalue())
 	return img_str
 
+def pdf_to_base64(filename):
+	from frappe.utils.file_manager import get_file_path
+
+	if '../' in filename or filename.rsplit('.')[-1] not in ['pdf', 'PDF']:
+		return
+
+	file_path = get_file_path(filename)
+	if not file_path:
+		return
+
+	with open(file_path, 'rb') as pdf_file:
+		base64_string = base64.b64encode(pdf_file.read())
+
+	return base64_string
 
 # from Jinja2 code
 _striptags_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
@@ -1580,7 +1622,7 @@ def get_user_info_for_avatar(user_id):
 	}
 	try:
 		user_info["email"] = frappe.get_cached_value("User", user_id, "email")
-		user_info["name"] = frappe.get_cached_value("User", user_id, "fullname")
+		user_info["name"] = frappe.get_cached_value("User", user_id, "full_name")
 		user_info["image"] = frappe.get_cached_value("User", user_id, "user_image")
 	except Exception:
 		frappe.local.message_log = []
