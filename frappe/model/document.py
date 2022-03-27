@@ -166,7 +166,7 @@ class Document(BaseDocument):
 		for df in table_fields:
 			children = frappe.db.get_values(df.options,
 				{"parent": self.name, "parenttype": self.doctype, "parentfield": df.fieldname},
-				"*", as_dict=True, order_by="idx asc")
+				"*", as_dict=True, order_by="idx asc", for_update=self.flags.for_update)
 			if children:
 				self.set(df.fieldname, children)
 			else:
