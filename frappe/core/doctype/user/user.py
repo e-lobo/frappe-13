@@ -716,6 +716,11 @@ def ask_pass_update():
 		WHERE awaiting_password = 1""", as_dict=True)
 
 	password_list = [ user.get("user") for user in users ]
+
+	current_val = frappe.db.get_default("email_user_password")
+	if current_val == u','.join(password_list):
+		return
+
 	set_default("email_user_password", u','.join(password_list))
 
 def _get_user_for_update_password(key, old_password):
