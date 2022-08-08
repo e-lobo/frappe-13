@@ -38,8 +38,17 @@ def get_queues_timeout():
 
 redis_connection = None
 
-def enqueue(method, queue='default', timeout=None, event=None,
-	is_async=True, job_name=None, now=False, enqueue_after_commit=False, **kwargs):
+def enqueue(method,
+		queue='default',
+		timeout=None,
+		event=None,
+		is_async=True,
+		job_name=None,
+		now=False,
+		enqueue_after_commit=False,
+		*,
+		at_front=False,
+		**kwargs):
 	'''
 		Enqueue method to be executed using a background worker
 
@@ -82,8 +91,7 @@ def enqueue(method, queue='default', timeout=None, event=None,
 		})
 		return frappe.flags.enqueue_after_commit
 	else:
-		return q.enqueue_call(execute_job, timeout=timeout,
-			kwargs=queue_args)
+		return q.enqueue_call(execute_job, timeout=timeout, kwargs=queue_args, at_front=at_front)
 
 def enqueue_doc(doctype, name=None, method=None, queue='default', timeout=300,
 	now=False, **kwargs):
