@@ -173,6 +173,7 @@ def add_role_permissions(doctype, role):
 	return name
 
 def get_non_standard_user_type_details():
+	user_type_details = {}
 	user_types = frappe.get_all('User Type',
 		fields=['apply_user_permission_on', 'name', 'user_id_field'],
 		filters={'is_standard': 0})
@@ -180,9 +181,9 @@ def get_non_standard_user_type_details():
 	if user_types:
 		user_type_details = {d.name: [d.apply_user_permission_on, d.user_id_field] for d in user_types}
 
-		frappe.cache().set_value('non_standard_user_types', user_type_details)
+	frappe.cache().set_value('non_standard_user_types', user_type_details)
 
-		return user_type_details
+	return user_type_details
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
@@ -241,7 +242,7 @@ def apply_permissions_for_non_standard_user_type(doc, method=None):
 
 	user_types = frappe.cache().get_value('non_standard_user_types')
 
-	if not user_types:
+	if user_types is None:
 		user_types = get_non_standard_user_type_details()
 
 	if not user_types:
