@@ -157,6 +157,8 @@ def process_response(response):
 	if hasattr(frappe.local, 'conf') and frappe.conf.allow_cors:
 		set_cors_headers(response)
 
+	run_process_request_hook(response)
+
 def set_cors_headers(response):
 	origin = frappe.request.headers.get('Origin')
 	allow_cors = frappe.conf.allow_cors
@@ -291,6 +293,11 @@ def after_request(rollback):
 	update_comments_in_parent_after_request()
 
 	return rollback
+
+
+def run_process_request_hook(response):
+	for process_request in frappe.get_hooks('process_request_hook', []):
+		frappe.get_attr(process_request)(response)
 
 application = local_manager.make_middleware(application)
 
