@@ -6,6 +6,8 @@ on:
 
     tags:
         - 'v*'
+  workflow_dispatch:
+
 jobs:
   build-leam-frappe-nginx:
     runs-on: ubuntu-20.04
